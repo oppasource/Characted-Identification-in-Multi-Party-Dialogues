@@ -1,5 +1,6 @@
 .py~
 .md~
+.md*
 .ipynb~
 .csv~
 .ipynb_checkpoints
