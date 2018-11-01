@@ -3,6 +3,7 @@ import model as m
 import torch
 from torch import nn, optim
 from torch.autograd import Variable
+from sklearn.metrics import confusion_matrix
 
 inp_dim = 25
 hidden_dim = 64
@@ -22,7 +23,6 @@ test_input = np.load(data_path + 'test_input.npy')
 # Test labels in form indexes from entity map
 test_label_index = np.load(data_path + 'test_label_index.npy')
 
-
 ####################### Loading Saved Model ####################
 # Using gpu if available else cpu
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
@@ -39,7 +39,8 @@ correct_tokens = 0
 correct_seq = 0
 
 i = 155
-
+truth_list = []
+pred_list = []
 for i in range(test_input.shape[0]):
     # Prepare the input
     inp = torch.from_numpy(test_input[i].reshape((-1,1,25))).to(device)
@@ -49,19 +50,29 @@ for i in range(test_input.shape[0]):
     out = torch.max(out,1)[1]
     
     # Following code is to calculate accuracy seperately for sequence and token entities
-    check = torch.eq(truth,out)
-    seq_len = check.size()[0]
-    correct_tokens_temp = torch.sum(check).item()
-    correct_tokens += correct_tokens_temp
-    
-    if (seq_len == correct_tokens_temp):
-        correct_seq += 1
-    
-    total_tokens += seq_len
-    total_seq += 1
+    # check = torch.eq(truth,out)
+    # seq_len = check.size()[0]
+    # print seq_len
+    # correct_tokens_temp = torch.sum(check).item()
+    # print correct_tokens_temp
+    # correct_tokens += correct_tokens_temp
+        
+    # if (seq_len == correct_tokens_temp):
+    #     correct_seq += 1
+        
+    # total_tokens += seq_len
+    # total_seq += 1
+    for i in range(truth.size()[0]):
+        if truth[i]!=torch.tensor(7):
+            if truth[i]==out[i]:
+                correct_tokens += 1
+            total_tokens += 1
+            truth_list.append(truth[i].item())
+            pred_list.append(out[i].item())  
 
-    
-token_accuracy = correct_tokens / total_tokens
-seq_accuracy = correct_seq / total_seq
+token_accuracy = correct_tokens / float(total_tokens)
+# seq_accuracy = correct_seq / total_seq
 print('Accuracy considering one entity at a time: ' + str(token_accuracy))
-print('Accuracy considering one whole sequence at a time: ' + str(seq_accuracy))
+# print('Accuracy considering one whole sequence at a time: ' + str(seq_accuracy))
+# Confusion Matrix
+print confusion_matrix(truth_list, pred_list)
