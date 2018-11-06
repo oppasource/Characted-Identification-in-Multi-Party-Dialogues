@@ -28,7 +28,8 @@ train_label_index = np.load(data_path + 'train_label_index.npy')
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 # Creating model
-model = m.SimpleLSTM(inp_dim, hidden_dim, n_classes)
+# model = m.SimpleLSTM(inp_dim, hidden_dim, n_classes)
+model = m.BiLSTM(inp_dim, hidden_dim, n_classes)
 model = model.to(device)
 
 # Defining loss function and optimizer
@@ -38,7 +39,7 @@ optimizer = torch.optim.Adam(model.parameters(), lr=lr)
 for epoch in range(epochs):
     # Keeping track of loss for every epoch
     total_loss = 0
-    for i in range(train_input.shape[0]):
+    for i in tqdm(range(train_input.shape[0])):
         # Reshape numpy array to SBI (seq, batch, input_dim)
         inp = train_input[i].reshape((-1,1,25))
         # Convert numpy array to torch tensor
