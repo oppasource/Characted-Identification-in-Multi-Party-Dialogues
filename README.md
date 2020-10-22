@@ -1,6 +1,6 @@
 # Characted-Identification-in-Multi-Party-Dialogues
 
-Main project repository for NLP course 2018.
+Main project repository for NLP course 2018.  
 The goal of this project was to assign each mention in a dialogue to the entity it's referring to. This is also known as the coreference resolution problem.
 
 ## Requirements
